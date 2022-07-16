@@ -4,7 +4,7 @@ import theme from '../theme';
 import { AppProps } from 'next/app';
 import { createClient, dedupExchange, fetchExchange, Provider } from 'urql';
 import { cacheExchange, Cache, QueryInput } from '@urql/exchange-graphcache';
-import { LoginMutation, MeDocument, MeQuery } from '../generated/graphql';
+import { LoginMutation, LogoutMutation, MeDocument, MeQuery, RegisterMutation } from '../generated/graphql';
 
 function MyApp({ Component, pageProps }: AppProps) {
   function betterUpdateQuery<Result, Query>(
@@ -21,32 +21,67 @@ function MyApp({ Component, pageProps }: AppProps) {
     fetchOptions: {
       credentials: 'include',
     },
-    // exchanges: [
-    //   dedupExchange,
-    //   cacheExchange({
-    //     updates: {
-    //       Mutation: {
-    //         login: (result, args, cache, info) => {
-    //           betterUpdateQuery<LoginMutation, MeQuery>(
-    //             cache,
-    //             { query: MeDocument },
-    //             result,
-    //             (result, query: any) => {
-    //               if (result.login.errors) {
-    //                 return query;
-    //               } else {
-    //                 return {
-    //                   me: result.login.user,
-    //                 };
-    //               }
-    //             }
-    //           );
-    //         },
-    //       },
-    //     },
-    //   }),
-    //   fetchExchange,
-    // ],
+    exchanges: [
+      dedupExchange,
+      cacheExchange({
+        updates: {
+          Mutation: {
+            login: (_result, args, cache, info) => {
+              betterUpdateQuery<LoginMutation, MeQuery>(
+                cache,
+                { query: MeDocument },
+                _result,
+                (result, query: any) => {
+                  if (result.login.errors) {
+                    return query;
+                  } else {
+                    return {
+                      me: result.login.user,
+                    };
+                  }
+                }
+              );
+            },
+            register: (_result, args, cache, info) => {
+              betterUpdateQuery<RegisterMutation, MeQuery>(
+                cache,
+                { query: MeDocument },
+                _result,
+                (result, query: any) => {
+                  if (result.register.errors) {
+                    return query;
+                  } else {
+                    return {
+                      me: result.register.user,
+                    };
+                  }
+                }
+              );
+            },
+            logout: (_result, args, cache, info) => {
+              betterUpdateQuery<LogoutMutation, MeQuery>(
+                cache,
+                { query: MeDocument },
+                _result,
+                (result, query: any) => {
+                  if (!result.logout) {
+                    return query;
+                  } else {
+                    console.log(cache,"cache");
+                    
+                    return {
+                      
+                      me: null,
+                    };
+                  }
+                }
+              );
+            },
+          },
+        },
+      }),
+      fetchExchange,
+    ],
   });
 
   return (
