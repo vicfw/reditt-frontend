@@ -24,7 +24,11 @@ const Login = () => {
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
             // worked
-            router.replace('/');
+            if (typeof router.query.next === 'string') {
+              router.replace(router.query.next);
+            } else {
+              router.replace('/');
+            }
           }
         }}
       >
