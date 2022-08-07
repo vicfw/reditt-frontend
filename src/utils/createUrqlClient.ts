@@ -7,6 +7,7 @@ import {
   MeDocument,
   LoginMutation,
   RegisterMutation,
+  CreatePostMutation,
 } from '../generated/graphql';
 import { betterUpdateQuery } from './betterUpdateQuery';
 import { pipe, tap } from 'wonka';
@@ -77,6 +78,21 @@ export const createUrqlClient = (ssrExchange: any) => ({
               }
             );
           },
+          // createPost: (_result, args, cache, info) => {
+          //   betterUpdateQuery<CreatePostMutation, MeQuery>(
+          //     cache,
+          //     { query: MeDocument },
+          //     _result,
+          //     (result, query: any) => {
+          //       if (result.createPost) {
+          //         return query;
+          //       } else {
+          //         return {
+          //           me: result.register.user,
+          //         };
+          //       }
+          //     }
+          //   );
           // logout: (_result, args, cache, info) => {
           //   betterUpdateQuery<LogoutMutation, MeQuery>(
           //     cache,
