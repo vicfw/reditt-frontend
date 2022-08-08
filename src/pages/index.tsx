@@ -1,12 +1,18 @@
-import { Box, Button, Heading, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Stack, Text } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
+import { useState } from 'react';
 import Layout from '../components/Layout';
 import { usePostsQuery } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 
 const Index = () => {
-  const [{ data, fetching }] = usePostsQuery({ variables: { limit: 10 } });
+  const [variables, setVariables] = useState({
+    limit: 10,
+    cursor: '' as string | undefined,
+  });
+
+  const [{ data, fetching, stale }] = usePostsQuery({ variables });
 
   return (
     <Layout variant="regular">
@@ -17,13 +23,28 @@ const Index = () => {
       <Stack spacing={8}>
         {!data
           ? null
-          : data.posts.map((p, i) => (
+          : data.posts.posts.map((p, i) => (
               <Box p={5} shadow="md" borderWidth="1px" key={p.id}>
                 <Heading fontSize="xl">{p.title}</Heading>
-                <Text mt={4}>{p.text}</Text>
+                <Text mt={4}>{p.textSnippet}</Text>
               </Box>
             ))}
       </Stack>
+      {data && data.posts.hasMore ? (
+        <Flex my={5} justifyContent="center">
+          <Button
+            onClick={() => {
+              setVariables({
+                limit: variables.limit,
+                cursor: data.posts.posts.at(-1)?.createdAt,
+              });
+            }}
+            isLoading={stale}
+          >
+            Load more!
+          </Button>
+        </Flex>
+      ) : null}
     </Layout>
   );
 };
