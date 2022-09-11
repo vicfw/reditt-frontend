@@ -12,6 +12,7 @@ import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
 import { useState } from 'react';
 import Layout from '../components/Layout';
+import UpdootSection from '../components/UpdootSection';
 import { usePostsQuery } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 
@@ -34,19 +35,7 @@ const Index = () => {
           ? null
           : data!.posts.posts.map((p, i) => (
               <Flex p={5} shadow="md" borderWidth="1px" key={p.id}>
-                <Flex direction={'column'} alignItems="center" mr={4}>
-                  <Box>
-                    <IconButton aria-label={'ChevronUpIcon'}>
-                      <ChevronUpIcon />
-                    </IconButton>
-                  </Box>
-                  <Box>{p.points}</Box>
-                  <Box>
-                    <IconButton aria-label={'ChevronDownIcon'}>
-                      <ChevronDownIcon />
-                    </IconButton>
-                  </Box>
-                </Flex>
+                <UpdootSection post={p} />
                 <Box>
                   <Heading fontSize="xl">{p.title}</Heading>
                   <Text>posted by {p.creator.username}</Text>
