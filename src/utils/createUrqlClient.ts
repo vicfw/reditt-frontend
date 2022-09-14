@@ -1,13 +1,13 @@
-import { cacheExchange, Resolver } from '@urql/exchange-graphcache';
+import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
 import {
   dedupExchange,
   Exchange,
   fetchExchange,
   stringifyVariables,
-} from 'urql';
+} from "urql";
 
-import Router from 'next/router';
-import { pipe, tap } from 'wonka';
+import Router from "next/router";
+import { pipe, tap } from "wonka";
 import {
   LoginMutation,
   LogoutMutation,
@@ -15,10 +15,10 @@ import {
   MeQuery,
   RegisterMutation,
   VoteMutationVariables,
-} from '../generated/graphql';
-import { betterUpdateQuery } from './betterUpdateQuery';
-import { gql } from '@urql/core';
-import { isServer } from './isServer';
+} from "../generated/graphql";
+import { betterUpdateQuery } from "./betterUpdateQuery";
+import { gql } from "@urql/core";
+import { isServer } from "./isServer";
 
 const cursorPagination = (): Resolver => {
   return (_parent, fieldArgs, cache, info) => {
@@ -35,15 +35,15 @@ const cursorPagination = (): Resolver => {
 
     const key = cache.resolve(entityKey, fieldKey) as string;
 
-    const isItInTheCache = cache.resolve(key, 'posts');
+    const isItInTheCache = cache.resolve(key, "posts");
 
     info.partial = !isItInTheCache;
     let hasMore = true;
     const results: string[] = [];
     fieldInfos.forEach((fi) => {
       const key = cache.resolve(entityKey, fi.fieldKey) as string;
-      const data = cache.resolve(key, 'posts') as string[];
-      const _hasMore = cache.resolve(key, 'hasMore') as string[];
+      const data = cache.resolve(key, "posts") as string[];
+      const _hasMore = cache.resolve(key, "hasMore") as string[];
 
       if (!_hasMore) {
         hasMore = _hasMore;
@@ -53,7 +53,7 @@ const cursorPagination = (): Resolver => {
     });
 
     return {
-      __typename: 'PaginatedPosts',
+      __typename: "PaginatedPosts",
       hasMore,
       posts: results,
     };
@@ -118,8 +118,8 @@ const errorExchange: Exchange =
       forward(ops$),
       tap(({ error }) => {
         if (error) {
-          if (error?.message.includes('Not authenticated!')) {
-            Router.replace('/login');
+          if (error?.message.includes("Not authenticated!")) {
+            Router.replace("/login");
           }
         }
       })
@@ -127,16 +127,16 @@ const errorExchange: Exchange =
   };
 
 export const createUrqlClient = (ssrExchange: any, ctx: any) => {
-  let cookie = '';
+  let cookie = "";
 
   if (isServer()) {
-    cookie = ctx.req.headers.cookie;
+    cookie = ctx?.req.headers.cookie;
   }
 
   return {
-    url: 'http://localhost:4000/graphql',
+    url: "http://localhost:4000/graphql",
     fetchOptions: {
-      credentials: 'include' as const,
+      credentials: "include" as const,
       headers: cookie
         ? {
             cookie,
@@ -186,12 +186,12 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
               }
             },
             createPost: (_result, args, cache, info) => {
-              const allFields = cache.inspectFields('Query');
+              const allFields = cache.inspectFields("Query");
               const fieldInfos = allFields.filter(
-                (info) => info.fieldName === 'posts'
+                (info) => info.fieldName === "posts"
               );
               fieldInfos.forEach((fi) => {
-                cache.invalidate('Query', 'posts', fi.arguments);
+                cache.invalidate("Query", "posts", fi.arguments);
               });
             },
             logout: (_result, args, cache, info) => {
