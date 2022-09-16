@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Link } from '@chakra-ui/react';
+import { Box, Button, Container, Flex, Heading, Link } from '@chakra-ui/react';
 import React, { FC } from 'react';
 import NextLink from 'next/link';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
@@ -29,14 +29,17 @@ const NavBar: FC<any> = ({}) => {
     );
   } else {
     body = (
-      <Flex>
-        <Box mr={4}>{data.me.user?.username}</Box>
+      <Flex alignItems={'center'}>
+        <Box mr={4} color="#fff">
+          Welcome {data.me.user?.username}
+        </Box>
+
+        <NextLink href="/create-post">
+          <Button mr={2}>Create post</Button>
+        </NextLink>
+
         <Box>
-          <Button
-            variant={'link'}
-            isLoading={logoutFetching}
-            onClick={() => logout()}
-          >
+          <Button isLoading={logoutFetching} onClick={() => logout()}>
             logout
           </Button>
         </Box>
@@ -45,9 +48,22 @@ const NavBar: FC<any> = ({}) => {
   }
 
   return (
-    <Flex position="sticky" zIndex={10} top={0} bg="tomato" p={4}>
-      <Box ml="auto">{body}</Box>
-    </Flex>
+    <Container
+      position="sticky"
+      zIndex={10}
+      top={0}
+      bg="tomato"
+      p={4}
+      width={'100%'}
+      maxW={'100%'}
+    >
+      <Flex maxW={800} flex={1} margin="auto" align="center">
+        <Heading color={'#fff'}>
+          <NextLink href={'/'}>LiReddiit</NextLink>
+        </Heading>
+        <Box ml="auto">{body}</Box>
+      </Flex>
+    </Container>
   );
 };
 export default NavBar;

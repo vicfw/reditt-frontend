@@ -5,7 +5,7 @@ import NavBar from './NavBar';
 import Wrapper from './Wrapper';
 
 interface LayoutProps {
-  variant: WrapperVariants;
+  variant?: WrapperVariants;
   children: any;
 }
 

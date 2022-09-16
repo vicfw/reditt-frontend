@@ -1,16 +1,8 @@
-import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  IconButton,
-  Stack,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Stack, Text } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
-import NextLink from 'next/link';
+import Link from 'next/link';
 import { useState } from 'react';
+import EditDeletePostButtons from '../components/EditDeletePostButtons';
 import Layout from '../components/Layout';
 import UpdootSection from '../components/UpdootSection';
 import { usePostsQuery } from '../generated/graphql';
@@ -22,27 +14,42 @@ const Index = () => {
     cursor: '' as string | undefined,
   });
 
-  const [{ data, fetching, stale }] = usePostsQuery({ variables });
+  const [{ data, stale }] = usePostsQuery({ variables });
 
   return (
     <Layout variant="regular">
-      <NextLink href="/create-post">
-        <Button>Create post</Button>
-      </NextLink>
-      <br />
       <Stack spacing={8}>
         {!data
           ? null
-          : data!.posts.posts.map((p, i) => (
-              <Flex p={5} shadow="md" borderWidth="1px" key={p.id}>
-                <UpdootSection post={p} />
-                <Box>
-                  <Heading fontSize="xl">{p.title}</Heading>
-                  <Text>posted by {p.creator.username}</Text>
-                  <Text mt={4}>{p.textSnippet}</Text>
-                </Box>
-              </Flex>
-            ))}
+          : data!.posts.posts.map((p, i) =>
+              !p ? null : ( //if we don't add it here we gonna get error because of invalidation in cache update
+                <Flex p={5} shadow="md" borderWidth="1px" key={p.id}>
+                  <UpdootSection post={p} />
+                  <Box flex={1}>
+                    <Link
+                      href="/post/[id]"
+                      as={`post/${p.id}`}
+                      prefetch={false}
+                    >
+                      <Heading cursor={'pointer'} fontSize="xl">
+                        {p.title}
+                      </Heading>
+                    </Link>
+                    <Text>posted by {p.creator.username}</Text>
+                    <Flex>
+                      <Text flex={1} mt={4}>
+                        {p.textSnippet}
+                      </Text>
+                      {/* edit and delete buttons */}
+                      <EditDeletePostButtons
+                        id={p.id}
+                        creatorId={p.creator.id}
+                      />
+                    </Flex>
+                  </Box>
+                </Flex>
+              )
+            )}
       </Stack>
       {data && data.posts.hasMore ? (
         <Flex my={5} justifyContent="center">
