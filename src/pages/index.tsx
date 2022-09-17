@@ -1,12 +1,10 @@
 import { Box, Button, Flex, Heading, Stack, Text } from '@chakra-ui/react';
-import { withUrqlClient } from 'next-urql';
 import Link from 'next/link';
 import { useState } from 'react';
 import EditDeletePostButtons from '../components/EditDeletePostButtons';
 import Layout from '../components/Layout';
 import UpdootSection from '../components/UpdootSection';
 import { usePostsQuery } from '../generated/graphql';
-import { createUrqlClient } from '../utils/createUrqlClient';
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -14,7 +12,7 @@ const Index = () => {
     cursor: '' as string | undefined,
   });
 
-  const [{ data, stale }] = usePostsQuery({ variables });
+  const { data, loading } = usePostsQuery({ variables });
 
   return (
     <Layout variant="regular">
@@ -60,7 +58,7 @@ const Index = () => {
                 cursor: data.posts.posts.at(-1)?.createdAt,
               });
             }}
-            isLoading={stale}
+            isLoading={loading}
           >
             Load more!
           </Button>
@@ -70,4 +68,4 @@ const Index = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
+export default Index;
