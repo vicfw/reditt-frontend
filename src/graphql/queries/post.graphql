@@ -7,5 +7,8 @@ query Post($id: Int!) {
     points
     text
     voteStatus
+    creator {
+      id
+    }
   }
 }

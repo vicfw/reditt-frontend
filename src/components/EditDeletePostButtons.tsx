@@ -29,7 +29,14 @@ const EditDeletePostButtons: FC<EditDeletePostButtonsProps> = ({
         ml={'3'}
         aria-label="deletePost"
         icon={<DeleteIcon />}
-        onClick={() => deletePost({ variables: { id } })}
+        onClick={() =>
+          deletePost({
+            variables: { id },
+            update: (cache) => {
+              cache.evict({ id: 'Post:' + id });
+            },
+          })
+        }
       />
     </Box>
   );

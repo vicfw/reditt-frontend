@@ -1,18 +1,19 @@
 import { Box, Button, Flex, Heading, Stack, Text } from '@chakra-ui/react';
 import Link from 'next/link';
-import { useState } from 'react';
 import EditDeletePostButtons from '../components/EditDeletePostButtons';
 import Layout from '../components/Layout';
 import UpdootSection from '../components/UpdootSection';
-import { usePostsQuery } from '../generated/graphql';
+import { PostsQuery, usePostsQuery } from '../generated/graphql';
+import { withApollo } from '../utils/withApollo';
 
 const Index = () => {
-  const [variables, setVariables] = useState({
-    limit: 15,
-    cursor: '' as string | undefined,
+  const { data, loading, fetchMore, variables } = usePostsQuery({
+    variables: {
+      limit: 15,
+      cursor: '' as string | undefined,
+    },
+    notifyOnNetworkStatusChange: true, //its cause we get loading state correctly
   });
-
-  const { data, loading } = usePostsQuery({ variables });
 
   return (
     <Layout variant="regular">
@@ -53,9 +54,30 @@ const Index = () => {
         <Flex my={5} justifyContent="center">
           <Button
             onClick={() => {
-              setVariables({
-                limit: variables.limit,
-                cursor: data.posts.posts.at(-1)?.createdAt,
+              fetchMore({
+                variables: {
+                  limit: variables?.limit,
+                  cursor: data.posts.posts.at(-1)?.createdAt,
+                },
+                // updateQuery: (
+                //   perviousValue,
+                //   { fetchMoreResult }
+                // ): PostsQuery => {
+                //   if (!fetchMoreResult) {
+                //     return perviousValue as PostsQuery;
+                //   }
+                //   return {
+                //     __typename: 'Query',
+                //     posts: {
+                //       __typename: 'PaginatedPosts',
+                //       hasMore: (fetchMoreResult as PostsQuery).posts.hasMore,
+                //       posts: [
+                //         ...perviousValue.posts.posts,
+                //         ...(fetchMoreResult as PostsQuery).posts.posts,
+                //       ],
+                //     },
+                //   };
+                // },
               });
             }}
             isLoading={loading}
@@ -68,4 +90,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default withApollo({ ssr: true })(Index);
