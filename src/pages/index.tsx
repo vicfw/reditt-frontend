@@ -3,7 +3,7 @@ import Link from 'next/link';
 import EditDeletePostButtons from '../components/EditDeletePostButtons';
 import Layout from '../components/Layout';
 import UpdootSection from '../components/UpdootSection';
-import { PostsQuery, usePostsQuery } from '../generated/graphql';
+import { usePostsQuery } from '../generated/graphql';
 import { withApollo } from '../utils/withApollo';
 
 const Index = () => {
@@ -12,8 +12,11 @@ const Index = () => {
       limit: 15,
       cursor: '' as string | undefined,
     },
+    ssr: true,
     notifyOnNetworkStatusChange: true, //its cause we get loading state correctly
   });
+
+  console.log(data, 'data');
 
   return (
     <Layout variant="regular">

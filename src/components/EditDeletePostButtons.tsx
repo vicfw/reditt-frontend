@@ -27,7 +27,7 @@ const EditDeletePostButtons: FC<EditDeletePostButtonsProps> = ({
       </NextLink>
       <IconButton
         ml={'3'}
-        aria-label="deletePost"
+        aria-label="deletePost" 
         icon={<DeleteIcon />}
         onClick={() =>
           deletePost({
